@@ -25,10 +25,10 @@ const InputBar: React.FC<InputProps> = ({
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 1}}
+      // initial={{ height: -50, opacity: 0 }}
+      // animate={{ height: 60, opacity: 1 }}
+      // exit={{ height: -50 , opacity: 0 }}
+      // transition={{ duration: 1 }}
     >
       <label
         className="block text-sm font-medium leading-6 text-gray-900"
