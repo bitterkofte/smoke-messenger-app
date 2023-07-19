@@ -1,18 +1,32 @@
 "use client";
 
-import Button from "@/app/components/inputs/Button";
+import Button from "@/app/components/Button";
 import InputBar from "@/app/components/inputs/InputBar";
 import AuthSocialButton from "./AuthSocialButton";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, FieldValues, useForm } from "react-hook-form";
 import { BsGithub, BsGoogle } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+import { toast } from 'react-hot-toast';
+import { signIn, useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 type Variant = "LOGIN" | "REGISTER";
 
 const AuthForm = () => {
+  const session = useSession();
+  const router = useRouter();
   const [variant, setVariant] = useState<Variant>("LOGIN");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if(session?.status === 'authenticated') {
+      // console.log('Authenticated!');
+      router.push('/users');
+    }
+  }, [session?.status, router])
+  
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") setVariant("REGISTER");
@@ -34,25 +48,41 @@ const AuthForm = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
     if (variant === "REGISTER") {
-      // axios register
+      axios.post('/api/register', data)
+      .then(() => signIn('credentials', data))
+      .catch(() => toast.error('Oops! Something went wrong.'))
+      .finally(() => setIsLoading(false))
     }
     if (variant === "LOGIN") {
-      //nextauth signin
+      signIn('credentials', {...data, redirect: false})
+      .then((callback) => {
+        callback?.error && toast.error('Invalid credentials');
+        if(callback?.ok && !callback?.error){
+          toast.success('Logged in successfully!')
+          router.push('/users');
+        } 
+      })
+      .finally(() => setIsLoading(false));
     }
   };
 
   const socialConnect = (action: string) => {
     setIsLoading(true);
-    //nextauth social signin
+    signIn(action, {redirect: false})
+    .then((callback) => {
+      callback?.error && toast.error('Invalid credentials');
+      callback?.ok && !callback?.error && toast.success('Logged in successfully!')
+    })
+    .finally(() => setIsLoading(false));
   };
 
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <motion.div //NOTE 0
         // key={variant} 
-        initial={{ height: 200 }}
-        animate={{ height: variant === "LOGIN" ? 412 : 505 }}
-        exit={{ height: 100 }}
+        // initial={{ height: 412 }}
+        animate={{ height: variant === "LOGIN" ? 428 : 505 }}
+        // exit={{ height: 100 }}
         transition={{ duration: 0.3 }}
         className="px-4 py-8 shadow sm:rounded-lg sm:px-10 bg-white overflow-hidden transition-all duration-200"
       >
