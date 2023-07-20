@@ -28,10 +28,11 @@ const useRoutes = () => {
         href: "#",
         onClick: () => signOut(),
         icon: HiArrowLeftOnRectangle,
-      },
+      }
     ],
     [pathname, conversationId]
   );
+  return routes;
 };
 
 export default useRoutes;

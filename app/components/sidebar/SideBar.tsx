@@ -1,9 +1,13 @@
 import DesktopSidebar from "./DesktopSidebar";
+import MobileBottomBar from "./MobileBottomBar";
+import getCurrentUser from "@/app/actions/getCurrentUser";
 
 async function SideBar({children}: {children: React.ReactNode;}) {
+  const currentUser = await getCurrentUser();
   return (
     <div className="h-full">
-      <DesktopSidebar />
+      <DesktopSidebar currentUser={currentUser!} />
+      <MobileBottomBar />
       <main className="lg:pl-20 h-full">
         {children}
       </main>
